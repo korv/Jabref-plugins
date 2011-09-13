@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+   Based on example ant build file for export.misq plugin and the
+   main JabRef ant build file.
+		<fileset dir="${lib}" includes="*.jar" />
+-->
+<project name="fetchArxiv" default="jars" basedir=".">
+	<property name="src" value="src" />
+	<property name="jabref" value="lib/JabRef-2.6.jar" />
+	<property name="build" value="build" />
+	<property name="build.jar" value="${build}/fetchArxiv.jar" />
+	<property name="plugins.dir" value="../../jabref/trunk/jabref/plugins" />
+
+	<path id="classpath">
+		<pathelement path="${build}" />
+		<pathelement location="${jabref}" />
+	</path>
+	
+	<!-- compile classes -->
+	<target name="compile">
+		<mkdir dir="${build}" />
+		<javac debug="on" deprecation="on" destdir="${build}" source="1.6" target="1.6">
+			<src path="${src}" />
+			<classpath refid="classpath" />
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+
+	<!-- Jars up project 
+				<fileset dir="${src}" includes="plugin.xml" />
+	
+	-->
+	<target name="jars" depends="compile">
+		<jar destfile="${build.jar}">
+			<fileset dir="${build}"/>
+			<file file="${src}/plugin.xml" />
+		</jar>
+		<copy file="${build.jar}" todir="${plugins.dir}"/>
+	</target>
+
+	<target name="clean" description="Clean project">
+		<delete dir="${build}" />
+	</target>
+
+</project>

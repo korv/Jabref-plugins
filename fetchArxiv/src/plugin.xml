@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+<plugin id="fetchArxiv" version="1.0">
+	
+	<requires>
+	  <import plugin-id="net.sf.jabref.core"/>
+	</requires>
+	
+	<!-- Will load code and resources from the home folder -->
+	<runtime>
+	  <library type="code" path="./" id="code"/>
+	  <library type="resources" path="./" id="resouces"/>
+	</runtime>
+	
+	<extension id="FetchArxivPlugin" plugin-id="net.sf.jabref.core" point-id="SidePanePlugin">
+	  <parameter id="sidePanePlugin" value="fetchArxiv.FetchArxivPlugin" />
+	  <parameter id="name" value="Fetch arXiv" />
+	  <parameter id="description" value="Fetch information from arXiv." />
+	</extension>
+	
+</plugin>
