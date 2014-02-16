@@ -1,0 +1,59 @@
+Renamefile plugin.
+
+This plugin helps to rename/copy/delete files attached
+to the BibTex entries (stored in the field "file").
+
+1. Name patterns
+Files can be renamed according to their BibTeX entry.
+The rename pattern uses the same syntax as the BibTeX
+key generator of JabRef. Additionally you can use the
+key [type] for an entry type. 
+
+Some examples of name patterns:
+[bibtexkey]
+folder/subfolder/[auth]. [shorttitle]
+[type]/[auth]-[year]-[title]
+[authors]. [title]
+[auth]-[year]-[shorttitle]
+[auth:lower]_[veryshorttitle:lower]_[year]
+
+2. Folders
+One can move files relative to their current position: 
+Uncheck "Use folder".
+
+Or one can move files relative to the file directory:
+Check "Use folder" and specify the relative folder.
+Example: folder/subfolder or folder\subfolder.
+
+Or one can move files using absolute paths:
+Check "Use folder" and specify the absolute folder.
+Example c:\folder\subfolder.
+
+3. Several files in one entry
+If there are several files attached to one entry, then
+numbers are added at the end of file names.
+
+
+History
+
+Version 1.5 (Feb 2014)
+* Added key [type] for an entry type.
+* Remove symbols \,/,<,>,?,{,},$,",:,\n from file names
+
+Version 1.4 (Jul 2012)
+* Help is added
+* Compatibility with JabRef 2.6
+* Dialog if file can not be deleted
+* Add numbers at the end of file names (plus confirmation dialog)
+  if files to be created already exist.
+* No base change mark after copying of files.
+
+Version 1.3 (Jul 2012)
+* Compatibility with JabRef 2.8.1
+* Update entry editor after renaming of files.
+ 
+Version 1.2 (Sep 2011)
+* Remove some symbols from filenames.
+
+Version 1.1 (Nov 2010)
+* Rename/Copy/Delete implementation
