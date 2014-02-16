@@ -233,12 +233,15 @@ public class RenameDialog extends JDialog implements ActionListener, FocusListen
 					switch(mode){
 					case 0: renameFile(b,of,this); break;
 					case 1: copyFile(b,of,this); break;
-					case 2: Utils.removeFile(b,of); break;
+					case 2: removeFile(b,of,this); break;
 					}
 				}
 			}
-			frame.basePanel().markBaseChanged();
 			dispose();
+			if(mode!=1){
+				frame.basePanel().markBaseChanged();
+				frame.basePanel().updateEntryEditorIfShowing();
+			}
 		} else if (s == btnCancel) {
 			dispose();
 		} else if (mode!=2 && (s==cbDir || s==cbName || s==tfDir || s==tfPattern))
@@ -248,6 +251,7 @@ public class RenameDialog extends JDialog implements ActionListener, FocusListen
 	public void focusLost(FocusEvent e) {
 		tm.changeData(bes);
 	}
+	
 	public String getNewFileName(String ofn,BibtexEntry b){
 		boolean sameDir=!cbDir.isSelected();
 		boolean sameName=!cbName.isSelected();
@@ -262,114 +266,155 @@ public class RenameDialog extends JDialog implements ActionListener, FocusListen
 
 	}
 
+	private String changeFileName(String f, int n){
+		if(n==0)
+			return f;
+		int m=f.lastIndexOf('.');
+		if(m==-1)
+			return f+n;
+		return f.substring(0,m)+n+'.'+f.substring(m+1);
+	}
+
 	public void renameFile(BibtexEntry b,String ofn, Component comp){
 		String dir = Utils.getFileDir();
 		File of = Util.expandFilename(ofn, dir); //null if file does not exist
-		if (of != null && of.exists()) {
-			String fn= Utils.getNewFileName(ofn,b);
-			while (true) {
-				File file = new File(fn);
-				if(!file.isAbsolute())
-					file=new File(dir,fn);
-				try {
-					if(file.getCanonicalPath().equals(of.getCanonicalPath())){
-						Utils.removeFileEntry(b,ofn);
-						Utils.addFileEntry(b,fn);
-						return;
+		if (of == null || !of.exists())
+			return;
+		String fn1= Utils.getNewFileName(ofn,b);
+		for(int n=0;;){
+			String fn=changeFileName(fn1,n);
+			File file = new File(fn);
+			if(!file.isAbsolute())
+				file=new File(dir,fn);
+			try {
+				if(file.getCanonicalPath().equals(of.getCanonicalPath())){
+					Utils.removeFileEntry(b,ofn);
+					Utils.addFileEntry(b,fn);
+					return;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			if(file.exists()){
+				n++;
+				continue;
+			}
+			if(n!=0){
+				String k = (String)JOptionPane.showInputDialog(comp,
+						"The file\n"
+						+ofn+"\n will be renamed to",
+						"New filename",
+						JOptionPane.PLAIN_MESSAGE,null,null,fn);
+				if(k == null)
+					return;
+				if(!k.equals(fn)){
+					if(Utils.haveSameExtensions(k,ofn)){
+						n=0;
+						fn1=k;
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (file.exists()) {
-					Object[] options = {"Overwrite file.", "Use a different filename.", "Cancel rename."};
-					int n = JOptionPane.showOptionDialog(comp,"A file named '" + fn + "' already exists.  What shall I do?",
-							"File already exists",
-							JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,	null,options,options[1]);
-					if (n != 0 && n!=1)
-						return;
-					if (n == 1) {
-						String k = (String)JOptionPane.showInputDialog(comp,"Please specify the filename to be used.",
-								"New filename",
-								JOptionPane.PLAIN_MESSAGE,null,null,fn);
-						if (k == null)
-							return;
-						fn = k;
-						continue;
-					} else
-						file.delete();
-				}
-				File par=file.getParentFile();
-				if(par!=null)
-					par.mkdirs();
-				if (!of.renameTo(file)) {
-					String k = (String)JOptionPane.showInputDialog(comp,"The filename " + fn + 
-							" seems to be invalid on your filesystem.\n" +
-							"Please specify a different filename to be used.",
-							"New filename",
-							JOptionPane.PLAIN_MESSAGE,null,null,fn);
-					if (k == null)
-						return;
-					fn = k;
 					continue;
 				}
-				Utils.removeFileEntry(b,ofn);
-				Utils.addFileEntry(b,fn);
-				break;
 			}
-		}	    
+			File par=file.getParentFile();
+			if(par!=null)
+				par.mkdirs();
+			if (!of.renameTo(file)){
+				String k = (String)JOptionPane.showInputDialog(comp,"Can not rename the file\n" + ofn
+						+"\n Close the file or specify a different filename",
+						"New filename",
+						JOptionPane.PLAIN_MESSAGE,null,null,fn);
+				if (k == null)
+					return;
+				if(!k.equals(fn) && Utils.haveSameExtensions(k,ofn)){
+					n=0;
+					fn1=k;
+				}
+				continue;
+			}
+			Utils.removeFileEntry(b,ofn);
+			Utils.addFileEntry(b,fn);
+			break;
+		}
 	}
 
 	public void copyFile(BibtexEntry b,String ofn, Component comp){
 		String dir = Utils.getFileDir();
 		File of = Util.expandFilename(ofn, dir); //null if file does not exist
-		if (of != null && of.exists()) {
-			String fn= Utils.getNewFileName(ofn,b);
-			while (true) {
-				File file = new File(fn);
-				if(!file.isAbsolute())
-					file=new File(dir,fn);
-				try {
-					if(file.getCanonicalPath().equals(of.getCanonicalPath())){
-						return;
+		if (of == null || !of.exists())
+			return;
+		String fn1= Utils.getNewFileName(ofn,b);
+		for(int n=0;;){
+			String fn=changeFileName(fn1,n);
+			File file = new File(fn);
+			if(!file.isAbsolute())
+				file=new File(dir,fn);
+			try {
+				if(file.getCanonicalPath().equals(of.getCanonicalPath()))
+					return;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			if(file.exists()){
+				n++;
+				continue;
+			}
+			if(n!=0){
+				String k = (String)JOptionPane.showInputDialog(comp,
+						"The file\n"
+						+ofn+"\n will be copied to",
+						"New filename",
+						JOptionPane.PLAIN_MESSAGE,null,null,fn);
+				if(k == null)
+					return;
+				if(!k.equals(fn)){
+					if(Utils.haveSameExtensions(k,ofn)){
+						n=0;
+						fn1=k;
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (file.exists()) {
-					Object[] options = {"Overwrite file.", "Use a different filename.", "Cancel copy file."};
-					int n = JOptionPane.showOptionDialog(comp,"A file named '" + fn + "' already exists.  What shall I do?",
-							"File already exists",
-							JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,	null,options,options[1]);
-					if (n != 0 && n!=1)
-						return;
-					if (n == 1) {
-						String k = (String)JOptionPane.showInputDialog(comp,"Please specify the filename to be used.",
-								"New filename",
-								JOptionPane.PLAIN_MESSAGE,null,null,fn);
-						if (k == null)
-							return;
-						fn = k;
-						continue;
-					} else
-						file.delete();
-				}
-				File par=file.getParentFile();
-				if(par!=null)
-					par.mkdirs();
-				if (!Utils.copyFile(of,file)) {
-					String k = (String)JOptionPane.showInputDialog(comp,"The filename " + fn + 
-							" seems to be invalid on your filesystem.\n" +
-							"Please specify a different filename to be used.",
-							"New filename",
-							JOptionPane.PLAIN_MESSAGE,null,null,fn);
-					if (k == null)
-						return;
-					fn = k;
 					continue;
 				}
-				break;
 			}
-		}	    
+			File par=file.getParentFile();
+			if(par!=null)
+				par.mkdirs();
+			if (!Utils.copyFile(of,file)){
+				String k = (String)JOptionPane.showInputDialog(comp,"Can not copy the file\n" + ofn
+						+"\n Specify a different filename",
+						"New filename",
+						JOptionPane.PLAIN_MESSAGE,null,null,fn);
+				if (k == null)
+					return;
+				if(!k.equals(fn) && Utils.haveSameExtensions(k,ofn)){
+					n=0;
+					fn1=k;
+				}
+				continue;
+			}
+			break;
+		}
 	}
 
+	private void removeFile(BibtexEntry b, String fn, Component comp) {
+		if(!Utils.hasFile(b,fn))
+			return;
+		String dir = Utils.getFileDir();
+		File f=Util.expandFilename(fn,dir); //null if file does not exist
+		if(f==null || !f.exists()){
+			Utils.removeFileEntry(b,fn);
+			return;
+		}
+		while(!f.delete()){
+			int k = JOptionPane.showConfirmDialog(comp,
+					"Close the file\n"+fn,
+					"Delete file",
+					JOptionPane.OK_CANCEL_OPTION);
+			if(k!=JOptionPane.OK_OPTION)
+				return;
+		}
+		Utils.removeFileEntry(b,fn);
+	}
+
+	
 }

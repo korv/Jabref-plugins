@@ -1,17 +1,12 @@
 package renamefile;
 
 
+import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import javax.swing.*;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -28,17 +23,32 @@ public class Utils {
 		if (!hasFile(b,fn)) {
 			FileListTableModel m = new FileListTableModel();
 			m.setContent(b.getField("file"));
-			ExternalFileType type =  Globals.prefs.getExternalFileTypeByExt(getExt(fn));
-			if(type==null && getExt(fn).equalsIgnoreCase("gz"))
-				type =  Globals.prefs.getExternalFileTypeByExt("ps");
+			ExternalFileType type = getExternalFileTypeForName(fn);
+//2.6			ExternalFileType type = Globals.prefs.getExternalFileTypeByName(getExt(fn));
 			FileListEntry e = new FileListEntry("",fn,type);
-			m.addEntry(0,e);
+			m.addEntry(m.getRowCount(),e);
 			b.setField("file",m.getStringRepresentation());
-			panel.markBaseChanged();
 		}
 	}
+	
+    private static ExternalFileType getExternalFileTypeForName(String filename) {
+    	// Code from Global.prefs.getExternalFileTypeForName() in JabRef 2.7+
+    	ExternalFileType[] types=Globals.prefs.getExternalFileTypeSelection();
+        int longestFound = -1;
+        ExternalFileType foundType = null;
+        for (ExternalFileType type:types){
+            if ((type.getExtension() != null) && filename.toLowerCase().
+                    endsWith(type.getExtension().toLowerCase())) {
+                if (type.getExtension().length() > longestFound) {
+                    longestFound = type.getExtension().length();
+                    foundType = type;
+                }
+            }
+        }
+        return foundType;
+    }
 
-	public static boolean hasFile(BibtexEntry b, String fn) {
+    public static boolean hasFile(BibtexEntry b, String fn) {
 		FileListTableModel m = new FileListTableModel();
 		m.setContent(b.getField("file"));
 		for (int j=0;j<m.getRowCount();j++) {
@@ -58,46 +68,43 @@ public class Utils {
 				m.removeEntry(j);
 		}
 		b.setField("file",m.getStringRepresentation());
-		panel.markBaseChanged();
-	}
-
-	public static void removeFile(BibtexEntry b, String fn) {
-		if(!hasFile(b,fn))
-			return;
-		removeFileEntry(b,fn);
-		String dir = getFileDir();
-		File f=Util.expandFilename(fn,dir);
-		if (f!=null)
-			f.delete();
 	}
 
 	public static String getFileDir() {
-		String dir = null;
-		if (panel != null) {
-			MetaData md = panel.metaData();
-			if (md != null) {
-				dir = md.getFileDirectory("file");
-				if (dir != null && dir.length() != 0)
-					return dir;
-				dir = md.getFileDirectory("pdf");
-				if (dir != null && dir.length() != 0)
-					return dir;
-			}
-		}
-		return null;
-	}
+		if(panel==null || panel.metaData()==null)
+			return null;
+		MetaData md=panel.metaData();
+		
+//Code from MetaData.getFileDirectory()
+		String key = Globals.prefs.get("userFileDirIndividual");
+        if(md.getData(key)==null)
+//2.6+
+        	key = "fileDirectory";
+//2.7+     	key = Globals.prefs.get("userFileDir");
+        Vector<String> vec = md.getData(key);
+        String dir;
+        if (vec!= null && !vec.isEmpty())
+        	dir = vec.get(0);
+        else
+        	dir = Globals.prefs.get("fileDirectory");
+        if (!(new File(dir)).isAbsolute() && (md.getFile() != null))
+        	dir = new StringBuffer(md.getFile().getParent()).
+        	append(System.getProperty("file.separator")).
+        	append(dir).toString();
+        return dir;
+    }
 
 	public static String getNewFileName(String ofn,BibtexEntry b){
 		boolean sameDir=Globals.prefs.getBoolean("SameFolder");
 		boolean sameName=Globals.prefs.getBoolean("SameName");
 		String dir=Globals.prefs.get("MoveFolder");
 		String pattern=Globals.prefs.get("RenamePattern");
-		return getNewFileName(ofn, b, sameDir, sameName,	dir, pattern);
+		return getNewFileName(ofn, b, sameDir, sameName, dir, pattern);
 	}
 
 	public static String getNewFileName(String ofn,BibtexEntry b,boolean sameDir,boolean sameName,
 			String dir,String pattern){
-		String s = System.getProperty("file.separator");
+		final String s = System.getProperty("file.separator");
 		String fn;
 		if(sameName) {
 			if(sameDir)
@@ -107,7 +114,7 @@ public class Utils {
 		} else
 			fn=makeLabel(pattern,b)+"."+getExt(ofn);
 		if(sameDir)
-			return ofn.substring(0,ofn.lastIndexOf(s)+1)+fn;
+			return fixSlash(ofn.substring(0,ofn.lastIndexOf(s)+1)+fn);
 		if(dir.isEmpty())
 			return fixSlash(fn);
 		if (dir.endsWith(s))
@@ -125,42 +132,45 @@ public class Utils {
 	}
 
 	private static String getExt(String f){
-		return f.substring(f.lastIndexOf('.')+1, f.length());
+		return f.substring(f.lastIndexOf('.')+1);
 	}
 
+	public static boolean haveSameExtensions(String f1,String f2){
+		return getExt(f1).equalsIgnoreCase(getExt(f2));
+	}
+	
 	public static String makeLabel(String pattern, BibtexEntry _entry) {
 		String label;
 		StringBuffer sb = new StringBuffer();
-		ArrayList<String> t = LabelPatternUtil.split(pattern);
-		boolean field = false, first=true;
-		for (String i:t) {
-			if(first) {
+		String[] bad_chars={"\\\\","/","<",">","\\?","\\{","\\}","\\$","\"","\n",":"};
+		boolean field = false, first =true;
+		for (String i : LabelPatternUtil.split(pattern)) {
+			if (first) {
 				first=false;
 				continue;
 			}
-			if (i.equals("[")) {
+			if (i.equals("["))
 				field = true;
-			} else if (i.equals("]")) {
+			else if (i.equals("]"))
 				field = false;
-			} else if (field) {
+			else if (field) {
 				String[] parts = LabelPatternUtil.parseFieldMarker(i);
-				label = LabelPatternUtil.makeLabel(_entry, parts[0]);
+				String val = parts[0];
+				if (val!=null & val.equals("type")) {
+					BibtexEntryType o = _entry.getType();
+					label = (o!=null ? o.getName():"");
+				} else
+					label = LabelPatternUtil.makeLabel(_entry, val);
 				if (parts.length > 1)
 					label = LabelPatternUtil.applyModifiers(label, parts, 1);
+				for(String s:bad_chars)
+					label=label.replaceAll(s,"");
 				sb.append(label);
 			} else {
 				sb.append(i);
 			}
 		}
 		label = sb.toString();
-		String[] bad={"\\\\","<",">","\\?","\\{","\\}","\\$","\"","\n",":"};
-		for(String s:bad)
-			label=label.replaceAll(s,"");
-		//		String regex = Globals.prefs.get("KeyPatternRegex");
-		//		if ((regex != null) && (regex.trim().length() > 0)) {
-		//			String replacement = Globals.prefs.get("KeyPatternReplacement");
-		//			label = label.replaceAll(regex, replacement);
-		//		}
 		return label;
 	}
 
@@ -186,4 +196,32 @@ public class Utils {
 		return true;
 	}
 	
+    public static void displayAbout(JFrame parent) {
+		InputStream stream = Utils.class.getResourceAsStream("/about.txt");
+		String text=streamToString(stream);
+        JTextArea ta = new JTextArea(text);
+        ta.setEditable(false);
+        ta.setBackground(Color.white);
+        JScrollPane sp = new JScrollPane(ta);
+        sp.setPreferredSize(new Dimension(700,500));
+        JOptionPane.showMessageDialog(parent,sp,
+                "About Renamefile plugin",JOptionPane.PLAIN_MESSAGE);
+    }
+	
+	public static String streamToString(InputStream is) {
+		final int len=0x10000;
+		final char[] buffer = new char[len];
+		StringBuilder out = new StringBuilder();
+		try{
+			Reader in = new InputStreamReader(is,"UTF-8");
+			int read;
+			while((read=in.read(buffer,0,len))!=-1)
+				out.append(buffer,0,read);
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return out.toString();
+	}
+
 }

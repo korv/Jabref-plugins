@@ -11,8 +11,7 @@ import net.sf.jabref.*;
 @SuppressWarnings("serial")
 class RenameFilePanel extends SidePaneComponent implements ActionListener {
 
-	private JButton btnMove,btnCopy,btnDelete;
-	private JButton btnSettings = new JButton(GUIGlobals.getImage("preferences"));
+	private JButton btnMove,btnCopy,btnDelete,btnSettings,btnHelp;
 	private JabRefFrame frame;
 
 	public RenameFilePanel(SidePaneManager manager,JabRefFrame frame,JMenuItem menu) {
@@ -26,6 +25,7 @@ class RenameFilePanel extends SidePaneComponent implements ActionListener {
 		btnDelete=getButton("Delete","Detach the local pdf from the " +
 				"BibTeX entry and delete the local pdf from the filesystem.","delete");
 		btnSettings=getButton("","Settings","preferences");
+		btnHelp=getButton("","Help","help");
 
 		JPanel split = new JPanel();
 		split.setLayout(new BoxLayout(split, BoxLayout.LINE_AXIS));
@@ -33,6 +33,7 @@ class RenameFilePanel extends SidePaneComponent implements ActionListener {
 		split.add(btnCopy);
 		split.add(btnDelete);
 		split.add(btnSettings);
+		split.add(btnHelp);
 
 		setContent(split);
 		setName("renamefile");
@@ -58,6 +59,8 @@ class RenameFilePanel extends SidePaneComponent implements ActionListener {
 		} else 	if (e.getSource() == btnDelete) {
 			BibtexEntry[] bes = panel.mainTable.getSelectedEntries();
 			new RenameDialog(frame,bes,2);
+		} else if (e.getSource() == btnHelp){
+			Utils.displayAbout(frame);
 		}
 	}
 

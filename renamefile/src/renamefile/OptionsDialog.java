@@ -8,12 +8,13 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import net.sf.jabref.Globals;
+
 import org.dyno.visual.swing.layouts.*;
 import org.dyno.visual.swing.layouts.GroupLayout;
 
-import net.sf.jabref.Globals;
-
 public class OptionsDialog extends JDialog implements ActionListener{
+	private static final long serialVersionUID = 1L;
 	private JCheckBox cbName,cbDir;
 	private JTextField tfDir,tfPattern;
 	private JButton btnOk,btnCancel;

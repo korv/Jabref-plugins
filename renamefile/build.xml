@@ -7,21 +7,28 @@
 <project name="renamefile" default="jars" basedir=".">
 	<property name="src" value="src" />
 	<property name="lib" value="lib" />
-	<property name="jabref" value="${lib}/JabRef-2.6.jar" />
 	<property name="build" value="build" />
-	<property name="build.jar" value="${build}/renamefile.jar" />
-	<property name="plugins.dir" value="../jabref/trunk/jabref/plugins" />
+	<property name="name.jar" value="renamefile.jar" />
+	<property name="build.jar" value="${build}/${name.jar}" />
+
+	<property name="jabref.v" value="2.9.2" />
+	<property name="jabref.dir" value="../jabref-${jabref.v}" />
+	<property name="jabref.jar" value="../JabRef-${jabref.v}.jar" />
+	
+	<property name="plugin.dir1" value="${jabref.dir}/plugins"/>
+	<property name="plugin.dir2" value="../plugins"/>
 
 	<path id="classpath">
 		<pathelement path="${build}" />
 		<pathelement location="${lib}/grouplayout.jar" />
-		<pathelement location="${jabref}" />
+		<pathelement location="${jabref.jar}" />
 	</path>
 	
 	<!-- compile classes -->
-	<target name="compile">
+	<target name="compile" depends="clean">
 		<mkdir dir="${build}" />
-		<javac debug="on" deprecation="on" destdir="${build}" source="1.6" target="1.6">
+		<javac includeantruntime="false" debug="on" deprecation="on"
+			destdir="${build}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${src}" />
 			<classpath refid="classpath" />
 			<compilerarg value="-Xlint:unchecked"/>
@@ -37,8 +44,10 @@
 			<zipfileset src="lib/grouplayout.jar" />
 			<fileset dir="${build}"/>
 			<file file="${src}/plugin.xml" />
+			<file file="${src}/about.txt" />
 		</jar>
-		<copy file="${build.jar}" todir="${plugins.dir}"/>
+		<copy file="${build.jar}" todir="${plugin.dir1}"/>
+		<copy file="${build.jar}" todir="${plugin.dir2}"/>
 	</target>
 
 	<target name="clean" description="Clean project">
