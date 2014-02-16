@@ -203,7 +203,7 @@ public class Utils {
         ta.setEditable(false);
         ta.setBackground(Color.white);
         JScrollPane sp = new JScrollPane(ta);
-        sp.setPreferredSize(new Dimension(700,500));
+        sp.setPreferredSize(new Dimension(620,500));
         JOptionPane.showMessageDialog(parent,sp,
                 "About Renamefile plugin",JOptionPane.PLAIN_MESSAGE);
     }

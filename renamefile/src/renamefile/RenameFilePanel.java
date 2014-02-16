@@ -1,6 +1,8 @@
 package renamefile;
 
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,22 +22,31 @@ class RenameFilePanel extends SidePaneComponent implements ActionListener {
 		this.frame = frame;
 		setActiveBasePanel(frame.basePanel());
 
-		btnMove=getButton("Rename","Rename/move file(s).","redo");
-		btnCopy=getButton("Copy","Copy file(s).","save");
+		btnMove=getButton("Rename","Rename/move file(s).","");
+		btnCopy=getButton("Copy","Copy file(s).","");
 		btnDelete=getButton("Delete","Detach the local pdf from the " +
-				"BibTeX entry and delete the local pdf from the filesystem.","delete");
+				"BibTeX entry and delete the local pdf from the filesystem.","");
 		btnSettings=getButton("","Settings","preferences");
 		btnHelp=getButton("","Help","help");
-
-		JPanel split = new JPanel();
-		split.setLayout(new BoxLayout(split, BoxLayout.LINE_AXIS));
-		split.add(btnMove);
-		split.add(btnCopy);
-		split.add(btnDelete);
-		split.add(btnSettings);
-		split.add(btnHelp);
-
-		setContent(split);
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+		JPanel p1 = new JPanel(new GridBagLayout());
+		JPanel p2 = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = .5;
+		p1.add(btnMove,c);
+		c.gridx = 1;
+		p1.add(btnDelete,c);
+		c.gridx=0;
+		p2.add(btnCopy,c);
+		c.gridx=1;
+		p2.add(btnSettings,c);
+		c.gridx=2;
+		p2.add(btnHelp,c);
+		p.add(p1);
+		p.add(p2);
+		setContent(p);
 		setName("renamefile");
 	}
 
