@@ -11,9 +11,9 @@
 	<property name="name.jar" value="renamefile.jar" />
 	<property name="build.jar" value="${build}/${name.jar}" />
 
-	<property name="jabref.v" value="2.9.2" />
+	<property name="jabref.v" value="2.10" />
 	<property name="jabref.dir" value="../jabref-${jabref.v}" />
-	<property name="jabref.jar" value="../JabRef-${jabref.v}.jar" />
+	<property name="jabref.jar" value="../jabref-${jabref.v}/build/lib/JabRef-${jabref.v}.jar" />
 	
 	<property name="plugin.dir1" value="${jabref.dir}/plugins"/>
 	<property name="plugin.dir2" value="../plugins"/>
