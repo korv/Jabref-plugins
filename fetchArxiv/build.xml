@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<!--
+<!-- 
    Based on example ant build file for export.misq plugin and the
-   main JabRef ant build file.
+   main JabRef ant build file..
 		<fileset dir="${lib}" includes="*.jar" />
 -->
 <project name="fetchArxiv" default="jars" basedir=".">
