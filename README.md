@@ -1,6 +1,7 @@
 # Jabref-plugins
 
-This is a small collection of plugins for JabRef. Currently it contains plugins:
+This is a small collection of plugins for the BibTex editor [JabRef](http://jabref.sourceforge.net/).
+Currently it contains plugins:
 
 * fetchArxiv
 * renamefile
