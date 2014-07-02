@@ -6,6 +6,7 @@ This is a small collection of plugins for JabRef. Currently it contains plugins:
 * renamefile
 
 In order to install any plugin one has to
+
 1. download the jar file for the plugin
 2. go to Plugins/Manage plugins/Install plugin in JabRef
 3. install the downloaded file
