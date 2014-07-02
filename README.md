@@ -21,8 +21,8 @@ providing its arXiv ID. The ID is saved in the BibTex entry field "eprint".
 This plugin can be used to rename/copy/delete files attached to BibTex entries.
 The file information is stored in the entry field "file". Files can be renamed
 according to their BibTeX entry. The rename pattern uses an extended syntax of
-the BibTeX key generator of JabRef. For more infromation and examples one can
-look to the help page of the plugin.
+the [BibTeX key generator](http://jabref.sourceforge.net/help/LabelPatterns.php) of JabRef.
+For more infromation and examples see the help page of the plugin.
 
 The older versions of this plugin can be found [here](https://github.com/korv/Jabref-plugins/downloads).
 
