@@ -192,8 +192,8 @@ public class Utils {
 
 		final String[] subst = {
 				"\\\\([oilL])[\\s\\}]+", "\\\\a(a)[\\s\\}]+", "\\\\A(A)[\\s\\}]+", "\\\\(ss)[\\s\\}]+", //symbols
-				"\\\\[a-zA-Z]+[\\s\\{\\}]+()", //latex commands
-				"\\\\[^\\w][\\s\\{]*([a-zA-z])[\\s\\}]+" //accents
+				"\\\\[a-zA-Z]+[\\s\\{\\}\\\\]+()", //latex commands
+				"\\\\[^\\w][\\s\\{]*([a-zA-z])" //accents
 		};
 		final String[] bad_chars = {"\\\\","/","<",">","\\?","\\{","\\}","\\$","\"","\n",":"};
 		StringBuffer sb = new StringBuffer();
