@@ -190,7 +190,12 @@ public class Utils {
 		}
 		catch (Exception e) {}
 
-		final String[] bad_chars={"\\\\","/","<",">","\\?","\\{","\\}","\\$","\"","\n",":"};
+		final String[] subst = {
+				"\\\\([oilL])[\\s\\}]+", "\\\\a(a)[\\s\\}]+", "\\\\A(A)[\\s\\}]+", "\\\\(ss)[\\s\\}]+", //symbols
+				"\\\\[a-zA-Z]+[\\s\\{\\}]+()", //latex commands
+				"\\\\[^\\w][\\s\\{]*([a-zA-z])[\\s\\}]+" //accents
+		};
+		final String[] bad_chars = {"\\\\","/","<",">","\\?","\\{","\\}","\\$","\"","\n",":"};
 		StringBuffer sb = new StringBuffer();
 		String label;
 		boolean field = false;
@@ -210,6 +215,8 @@ public class Utils {
 				} else
 					label = LabelPatternUtil.makeLabel(_entry, val);
 				label = applyModifiers(label, parts);
+				for (String c: subst)
+					label=label.replaceAll(c,"$1");					
 				for(String c: bad_chars)
 					label=label.replaceAll(c,"");
 				sb.append(label);

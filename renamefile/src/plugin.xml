@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="renameFile" version="1.6">
+<plugin id="renameFile" version="1.6.2">
 	
 	<requires>
 	  <import plugin-id="net.sf.jabref.core"/>

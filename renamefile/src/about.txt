@@ -1,4 +1,4 @@
-Renamefile plugin.
+Rename file plugin v1.6.2.
 
 This plugin can be used to rename/copy/delete files attached
 to the BibTex entries (stored in the field "file").
@@ -52,7 +52,12 @@ numbers are added at the end of file names.
 
 History
 
-Version 1.6 (Jul 2014)
+Version 1.6.2 (Jul 2014)
+* Substitution for \ss, \aa, \AA, \o, \i, \l, \L 
+* Remove accents \", \', \^, \v, \H, etc.
+* Remove all latex commands like \mathrm, \mathbb, etc.
+
+Version 1.6.1 (Jul 2014)
 * Bug fixes
 * Added modifier :regex:str1:str2
 * Compatibilty with JabRef 2.10.
