@@ -210,13 +210,13 @@ public class Utils {
 				} else
 					label = LabelPatternUtil.makeLabel(_entry, val);
 				label = applyModifiers(label, parts);
+				for(String c: bad_chars)
+					label=label.replaceAll(c,"");
 				sb.append(label);
 			} else
 				sb.append(s);
 		}
 		label = sb.toString();
-		for(String c: bad_chars)
-			label=label.replaceAll(c,"");
 		return label;
 	}
 	
