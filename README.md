@@ -24,7 +24,8 @@ according to their BibTeX entry. The rename pattern uses an extended syntax of
 the [BibTeX key generator](http://jabref.sourceforge.net/help/LabelPatterns.php) of JabRef.
 For more infromation and examples see the help page of the plugin.
 
-The older versions of this plugin can be found [here](https://github.com/korv/Jabref-plugins/downloads).
+The newest versions can be found [here](https://github.com/korv/Jabref-plugins/releases).
+The older versions can be found [here](https://github.com/korv/Jabref-plugins/downloads).
 
 
 
