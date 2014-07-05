@@ -1,13 +1,21 @@
 Renamefile plugin.
 
-This plugin helps to rename/copy/delete files attached
+This plugin can be used to rename/copy/delete files attached
 to the BibTex entries (stored in the field "file").
 
 1. Name patterns
+
 Files can be renamed according to their BibTeX entry.
 The rename pattern uses the same syntax as the BibTeX
-key generator of JabRef. Additionally you can use the
-key [type] for an entry type. 
+key generator of JabRef. For more details see
+http://jabref.sourceforge.net/help/LabelPatterns.php
+
+Additionally to the existing keys there is a key [type]
+for an entry type.
+
+Additionally to the existing modifiers (:lower, :upper, :abbr)
+there is a modifier :regex:str1:str2 that replaces string str1
+by string str2. One can apply several modifiers to one field.
 
 Some examples of name patterns:
 [bibtexkey]
@@ -16,16 +24,24 @@ folder/subfolder/[auth]. [shorttitle]
 [authors]. [title]
 [auth]-[year]-[shorttitle]
 [auth:lower]_[veryshorttitle:lower]_[year]
+[auth]_[title:regex: :_] - replaces spaces by underscores
+[authors:regex:':] - removes ' from all names
+
 
 2. Folders
-One can move files relative to their current position: 
+
+2.1. One can move files relative to their current position: 
 Uncheck "Use folder".
 
-Or one can move files relative to the file directory:
+2.2 One can move files relative to the file directory:
 Check "Use folder" and specify the relative folder.
 Example: folder/subfolder or folder\subfolder.
 
-Or one can move files using absolute paths:
+The file directory should be defined in
+Options/Preferences/External programs/Main file directory
+If it is empty, then the location of the bib file is used.
+
+2.3 One can move files using absolute paths:
 Check "Use folder" and specify the absolute folder.
 Example c:\folder\subfolder.
 
@@ -35,6 +51,11 @@ numbers are added at the end of file names.
 
 
 History
+
+Version 1.6 (Jul 2014)
+* Bug fixes
+* Added modifier :regex:str1:str2
+* Compatibilty with JabRef 2.10.
 
 Version 1.5 (Feb 2014)
 * Added key [type] for an entry type.

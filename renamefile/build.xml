@@ -5,15 +5,16 @@
 		<fileset dir="${lib}" includes="*.jar" />
 -->
 <project name="renamefile" default="jars" basedir=".">
+	<property name="plugin.ver" value="1.6" />
 	<property name="src" value="src" />
 	<property name="lib" value="lib" />
 	<property name="build" value="build" />
-	<property name="name.jar" value="renamefile.jar" />
+	<property name="name.jar" value="renamefile-${plugin.ver}.jar" />
 	<property name="build.jar" value="${build}/${name.jar}" />
 
-	<property name="jabref.v" value="2.10" />
-	<property name="jabref.dir" value="../jabref-${jabref.v}" />
-	<property name="jabref.jar" value="../jabref-${jabref.v}/build/lib/JabRef-${jabref.v}.jar" />
+	<property name="jabref.ver" value="2.10" />
+	<property name="jabref.dir" value="../jabref-${jabref.ver}" />
+	<property name="jabref.jar" value="${jabref.dir}/build/lib/JabRef-${jabref.ver}.jar" />
 	
 	<property name="plugin.dir1" value="${jabref.dir}/plugins"/>
 	<property name="plugin.dir2" value="../plugins"/>
@@ -24,6 +25,10 @@
 		<pathelement location="${jabref.jar}" />
 	</path>
 	
+	<target name="clean" description="Clean project">
+		<delete dir="${build}" />
+	</target>
+
 	<!-- compile classes -->
 	<target name="compile" depends="clean">
 		<mkdir dir="${build}" />
@@ -48,10 +53,6 @@
 		</jar>
 		<copy file="${build.jar}" todir="${plugin.dir1}"/>
 		<copy file="${build.jar}" todir="${plugin.dir2}"/>
-	</target>
-
-	<target name="clean" description="Clean project">
-		<delete dir="${build}" />
 	</target>
 
 </project>
